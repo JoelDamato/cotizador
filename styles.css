@@ -1,0 +1,100 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #191919;
+    color: #fff;
+    text-align: center;
+    padding: 20px;
+}
+
+.tabs {
+    margin-bottom: 20px;
+}
+
+.tittle {
+    display: inline-block; /* Hace que el ancho del elemento sea igual al ancho del contenido */
+    padding: 10px 20px;
+    background-color: #333; /* Color oscuro para el fondo */
+    color: #fff; /* Color blanco para el texto */
+    border: 2px solid #444; /* Borde oscuro */
+    border-radius: 8px; /* Bordes redondeados */
+    font-size: 16px;
+    font-family: 'Arial', sans-serif;
+}
+
+h1 {
+    display: inline-flex;
+    align-items: center;
+    font-size: 24px;
+    color: #ffffff;
+}
+
+.icon {
+    width: 24px; /* Ajusta el tamaño según tus necesidades */
+    height: 24px; /* Ajusta el tamaño según tus necesidades */
+    margin-right: 8px; /* Espacio entre el icono y el texto */
+}
+
+h4 {
+    margin-top: 10px;
+    font-size: 16px;
+    color: #666;
+}
+
+
+.tab-button {
+    padding: 10px 20px;
+    margin: 0 5px;
+    cursor: pointer;
+    background-color: #333; /* Color oscuro para el fondo */
+    color: #fff; /* Color blanco para el texto */
+    border: 2px solid #444; /* Borde oscuro */
+    border-radius: 8px; /* Bordes redondeados */
+    font-size: 16px;
+    font-family: 'Arial', sans-serif;
+    text-align: center;
+    transition: background-color 0.3s, border-color 0.3s, box-shadow 0.3s; /* Transiciones suaves */
+}
+
+.tab-button:hover {
+    background-color: #555; /* Fondo más claro al pasar el ratón */
+    border-color: #777; /* Borde más claro al pasar el ratón */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5); /* Sombra sutil */
+}
+
+.tab-button:active {
+    background-color: #222; /* Fondo aún más oscuro al hacer clic */
+    border-color: #444; /* Borde igual al fondo */
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5); /* Sombra interna al hacer clic */
+}
+
+
+.tab-content {
+    display: none;
+}
+
+
+label, select, input {
+    margin: 10px;
+}
+
+.active {
+    display: block;
+}
+
+
+.container {
+    display: flex;
+    justify-content: space-between;
+}
+
+.column {
+    flex: 1;
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+#cotizaciones-usd, #cotizaciones-ars, #dolar-blue {
+    margin-bottom: 20px;
+}
+
+
