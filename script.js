@@ -74,13 +74,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Obtener y mostrar cotizaciones en relación al USD
     const monedasDeseadas = {
-        'ARS': 'Peso Argentino',
-        'BRL': 'Real Brasileño',
-        'CLP': 'Peso Chileno',
-        'COP': 'Peso Colombiano',
-        'MXN': 'Peso Mexicano',
-        'PEN': 'Sol Peruano',
-        'UYU': 'Peso Uruguayo'
+        'ARS': '1 USD (OFICIAL) ',
+        'CLP': '1 USD ',
+        'COP': '1 USD ',
+        'MXN': '1 USD ',
+        'PEN': '1 USD ',
+        'UYU': '1 USD '
     };
 
     fetch(apiUrlUSD)
@@ -92,7 +91,7 @@ document.addEventListener('DOMContentLoaded', () => {
             Object.keys(monedasDeseadas).forEach(currency => {
                 if (rates[currency]) {
                     const checked = favoritos[currency] ? 'checked' : '';
-                    cotizacionesUSD.innerHTML += `<p>${monedasDeseadas[currency]} (${currency}): ${rates[currency]} 
+                    cotizacionesUSD.innerHTML += `<p>${rates[currency]} (${currency}) = ${monedasDeseadas[currency]} 
                     <input type="checkbox" ${checked} onclick="toggleFavorito('${currency}')"></p>`;
                 }
             });
