@@ -3,26 +3,30 @@ document.addEventListener('DOMContentLoaded', () => {
     const apiUrlUSD = `https://v6.exchangerate-api.com/v6/${apiKey}/latest/USD`;
     const apiUrlARS = `https://v6.exchangerate-api.com/v6/${apiKey}/latest/ARS`;
     const apiUrlDolarBlue = 'https://api.bluelytics.com.ar/v2/latest';
+    const apiUrlCriptoYa = 'https://criptoya.com/api/binancep2p/USDT/ARS/1';
 
     const cotizacionesUSD = document.getElementById('cotizaciones-usd');
     const cotizacionesARS = document.getElementById('cotizaciones-ars');
     const dolarBlueDiv = document.getElementById('dolar-blue');
+    const dolarCriptoDiv = document.getElementById('dolar-cripto');
     const favoritasList = document.getElementById('favoritas-list');
     const convertirButton = document.getElementById('convertir');
     const resultadoDiv = document.getElementById('resultado');
     const montoInput = document.getElementById('monto');
-    const monedaSelect = document.getElementById('moneda');
+    const monedaOrigenSelect = document.getElementById('moneda-origen');
+    const monedaDestinoSelect = document.getElementById('moneda-destino');
+
+    let dolarBlueVenta, dolarCriptoVenta, tasaCambioUSDARS;
 
     const currencyNames = {
-        'ARS': 'Peso Argentino',
-        'USD': 'Dólar Estadounidense',
+        'ARS': 'ARS',
         'BRL': 'Real Brasileño',
         'CLP': 'Peso Chileno',
         'COP': 'Peso Colombiano',
         'MXN': 'Peso Mexicano',
         'PEN': 'Sol Peruano',
         'UYU': 'Peso Uruguayo',
-        // Agrega otros nombres de monedas según sea necesario
+        'USDT': 'Dólar Cripto (USDT)',
     };
 
     let favoritos = JSON.parse(localStorage.getItem('favoritos')) || {};
@@ -37,33 +41,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function actualizarFavoritas() {
         favoritasList.innerHTML = '';
-        fetch(apiUrlUSD)
-            .then(response => response.json())
-            .then(data => {
-                const rates = data.conversion_rates;
-                Object.keys(favoritos).forEach(currency => {
-                    const value = rates[currency];
-                    favoritasList.innerHTML += `<p>${currencyNames[currency] || currency} (${currency}): ${value} 
-                    <button onclick="eliminarFavorito('${currency}')">Eliminar</button></p>`;
-                });
-            })
-            .catch(error => console.error('Error al obtener cotizaciones para favoritas:', error));
+        Object.keys(favoritos).forEach(currency => {
+            const value = favoritos[currency];
+            favoritasList.innerHTML += `<div class="cotizacion-item">
+                                          <span>${currencyNames[currency] || currency}: ${value}  </span> 
+                                          <button onclick="eliminarFavorito('${currency}')">Eliminar</button>
+                                        </div>`;
+        });
     }
 
-    function toggleFavorito(currency) {
+    function toggleFavorito(currency, value) {
         if (favoritos[currency]) {
             delete favoritos[currency];
         } else {
-            fetch(apiUrlUSD)
-                .then(response => response.json())
-                .then(data => {
-                    const value = data.conversion_rates[currency];
-                    favoritos[currency] = value;
-                    localStorage.setItem('favoritos', JSON.stringify(favoritos));
-                    actualizarFavoritas();
-                })
-                .catch(error => console.error('Error al obtener cotización de la moneda:', error));
+            favoritos[currency] = value;
         }
+        localStorage.setItem('favoritos', JSON.stringify(favoritos));
+        actualizarFavoritas();
     }
 
     function eliminarFavorito(currency) {
@@ -73,79 +67,87 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Obtener y mostrar cotizaciones en relación al USD
-    const monedasDeseadas = {
-        'ARS': '1 USD (OFICIAL) ',
-        'CLP': '1 USD ',
-        'COP': '1 USD ',
-        'MXN': '1 USD ',
-        'PEN': '1 USD ',
-        'UYU': '1 USD '
-    };
-
     fetch(apiUrlUSD)
         .then(response => response.json())
         .then(data => {
             const rates = data.conversion_rates;
+            tasaCambioUSDARS = rates['ARS'];
             cotizacionesUSD.innerHTML = '<h2>Cotizaciones en relación al USD</h2>';
             
-            Object.keys(monedasDeseadas).forEach(currency => {
+            Object.keys(currencyNames).forEach(currency => {
                 if (rates[currency]) {
                     const checked = favoritos[currency] ? 'checked' : '';
-                    cotizacionesUSD.innerHTML += `<p>${rates[currency]} (${currency}) = ${monedasDeseadas[currency]} 
-                    <input type="checkbox" ${checked} onclick="toggleFavorito('${currency}')"></p>`;
+                    cotizacionesUSD.innerHTML += `<div class="cotizacion-item">
+                                                    <span> $${rates[currency]} ${currencyNames[currency]} = 1 USD </span> 
+                                                    <input type="checkbox" ${checked} onclick="toggleFavorito('${currency}', '${currencyNames[currency]} (${currency}): ${rates[currency]}')">
+                                                  </div>`;
                 }
             });
         })
         .catch(error => console.error('Error al obtener cotizaciones en USD:', error));
-
-    // Obtener y mostrar cotizaciones en relación al ARS
-    fetch(apiUrlARS)
-        .then(response => response.json())
-        .then(data => {
-            const rates = data.conversion_rates;
-            cotizacionesARS.innerHTML = '<h2>Cotizaciones en relación al ARS</h2>';
-            Object.keys(rates).forEach(currency => {
-                const currencyName = currencyNames[currency] || currency;
-                const checked = favoritos[currency] ? 'checked' : '';
-                cotizacionesARS.innerHTML += `<p>${currencyName} (${currency}): ${rates[currency]} 
-                <input type="checkbox" ${checked} onclick="toggleFavorito('${currency}')"></p>`;
-            });
-        })
-        .catch(error => console.error('Error al obtener cotizaciones en ARS:', error));
 
     // Obtener y mostrar el precio del dólar blue en Argentina
     fetch(apiUrlDolarBlue)
         .then(response => response.json())
         .then(data => {
             const dolarBlueCompra = data.blue.value_buy;
-            const dolarBlueVenta = data.blue.value_sell;
+            dolarBlueVenta = data.blue.value_sell;
+            const dolarBlueValue = `Compra: ${dolarBlueCompra} ARS | Venta: ${dolarBlueVenta} ARS`;
+            const checked = favoritos['DolarBlue'] ? 'checked' : '';
+
             dolarBlueDiv.innerHTML = `<h2>Precio del Dólar Blue en Argentina</h2>
-                                      <p>Compra: ${dolarBlueCompra} ARS</p>
-                                      <p>Venta: ${dolarBlueVenta} ARS</p>`;
+                                      <div class="cotizacion-item">
+                                        <span>${dolarBlueValue}</span>
+                                        <input type="checkbox" ${checked} onclick="toggleFavorito('DolarBlue', '${dolarBlueValue}')">
+                                      </div>`;
         })
         .catch(error => console.error('Error al obtener el precio del dólar blue:', error));
 
-    // Convertir monedas de USD Blue a ARS
+    // Obtener y mostrar el precio del dólar cripto en pesos argentinos desde CriptoYa
+    fetch(apiUrlCriptoYa)
+        .then(response => response.json())
+        .then(data => {
+            const dolarCriptoCompra = data.bid; // Precio de compra
+            dolarCriptoVenta = data.ask; // Precio de venta
+            const dolarCriptoValue = `Compra: ${dolarCriptoCompra} ARS | Venta: ${dolarCriptoVenta} ARS`;
+            const checked = favoritos['DolarCripto'] ? 'checked' : '';
+
+            dolarCriptoDiv.innerHTML = `<h2>Precio del Dólar Cripto (USDT) en Binance P2P</h2>
+                                        <div class="cotizacion-item">
+                                          <span>${dolarCriptoValue}</span>
+                                          <input type="checkbox" ${checked} onclick="toggleFavorito('DolarCripto', '${dolarCriptoValue}')">
+                                        </div>`;
+        })
+        .catch(error => console.error('Error al obtener el precio del dólar cripto desde CriptoYa:', error));
+
+    // Función para convertir monedas entre USD, ARS, y USDT
     convertirButton.addEventListener('click', () => {
-        const monto = montoInput.value;
-        const moneda = monedaSelect.value;
+        const monto = parseFloat(montoInput.value);
+        const monedaOrigen = monedaOrigenSelect.value;
+        const monedaDestino = monedaDestinoSelect.value;
+        let resultado;
 
-        fetch(apiUrlDolarBlue)
-            .then(response => response.json())
-            .then(data => {
-                const dolarBlueCompra = data.blue.value_buy;
-                const dolarBlueVenta = data.blue.value_sell;
-                let resultado;
+        if (monedaOrigen === 'USD') {
+            if (monedaDestino === 'ARS') {
+                resultado = monto * tasaCambioUSDARS;
+            } else if (monedaDestino === 'USDT') {
+                resultado = monto * (tasaCambioUSDARS / dolarCriptoVenta);
+            }
+        } else if (monedaOrigen === 'ARS') {
+            if (monedaDestino === 'USD') {
+                resultado = monto / tasaCambioUSDARS;
+            } else if (monedaDestino === 'USDT') {
+                resultado = monto / dolarCriptoVenta;
+            }
+        } else if (monedaOrigen === 'USDT') {
+            if (monedaDestino === 'ARS') {
+                resultado = monto * dolarCriptoVenta;
+            } else if (monedaDestino === 'USD') {
+                resultado = monto * (dolarCriptoVenta / tasaCambioUSDARS);
+            }
+        }
 
-                if (moneda === 'ARS') {
-                    resultado = monto * dolarBlueVenta; // Convierte USD Blue a ARS
-                    resultadoDiv.innerHTML = `<p>${monto} USD (USD Blue) equivale a ${resultado.toFixed(2)} ARS</p>`;
-                } else if (moneda === 'USD') {
-                    resultado = monto / dolarBlueVenta; // Convierte ARS a USD Blue
-                    resultadoDiv.innerHTML = `<p>${monto} ARS equivale a ${resultado.toFixed(2)} USD (USD Blue)</p>`;
-                }
-            })
-            .catch(error => console.error('Error al convertir moneda:', error));
+        resultadoDiv.innerHTML = `<p>${monto} ${monedaOrigen} equivale a ${resultado.toFixed(2)} ${monedaDestino}</p>`;
     });
 
     actualizarFavoritas();
