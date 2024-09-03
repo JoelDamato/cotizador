@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const apiKey = '5bc1cec6967623eb3dcfbc4a';
     const apiUrlUSD = `https://v6.exchangerate-api.com/v6/${apiKey}/latest/USD`;
     const apiUrlARS = `https://v6.exchangerate-api.com/v6/${apiKey}/latest/ARS`;
-    const apiUrlDolarBlue = 'https://api.bluelytics.com.ar/v2/latest';
+    const apiUrlDolarBlue = 'https://criptoya.com/api/dolar';
     const apiUrlCriptoYa = 'https://criptoya.com/api/binancep2p/USDT/ARS/1';
 
     const cotizacionesUSD = document.getElementById('cotizaciones-usd');
@@ -17,6 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const monedaDestinoSelect = document.getElementById('moneda-destino');
 
     let dolarBlueVenta, dolarCriptoVenta, tasaCambioUSDARS;
+    let rates = {};
 
     const currencyNames = {
         'ARS': 'Peso Argentino',
@@ -27,6 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
         'PEN': 'Sol Peruano',
         'UYU': 'Peso Uruguayo',
         'USDT': 'Dólar Cripto (USDT)',
+        'EUR': 'Euro',
     };
 
     let favoritos = JSON.parse(localStorage.getItem('favoritos')) || {};
@@ -80,7 +82,7 @@ document.addEventListener('DOMContentLoaded', () => {
     fetch(apiUrlUSD)
         .then(response => response.json())
         .then(data => {
-            const rates = data.conversion_rates;
+            rates = data.conversion_rates;
             tasaCambioUSDARS = rates['ARS'];
             cotizacionesUSD.innerHTML = '<h2>Cotizaciones en relación al USD</h2>';
             
@@ -99,12 +101,14 @@ document.addEventListener('DOMContentLoaded', () => {
         })
         .catch(error => console.error('Error al obtener cotizaciones en USD:', error));
 
-    // Obtener y mostrar el precio del dólar blue en Argentina
+    // Obtener y mostrar el precio del dólar blue en Argentina desde CriptoYa
     fetch(apiUrlDolarBlue)
         .then(response => response.json())
         .then(data => {
-            const dolarBlueCompra = data.blue.value_buy;
-            dolarBlueVenta = data.blue.value_sell;
+            // Accedemos a los valores de compra y venta del dólar blue desde la nueva API
+            dolarBlueCompra = data.blue ? data.blue.bid : 0;
+            dolarBlueVenta = data.blue ? data.blue.ask : 0;
+
             const dolarBlueValue = `(BLUE) Compra: ${dolarBlueCompra} ARS | Venta: ${dolarBlueVenta} ARS`;
             const checked = favoritos['DolarBlue'] ? 'checked' : '';
 
@@ -117,7 +121,14 @@ document.addEventListener('DOMContentLoaded', () => {
                                         </label>
                                       </div>`;
         })
-        .catch(error => console.error('Error al obtener el precio del dólar blue:', error));
+        .catch(error => {
+            console.error('Error al obtener el precio del dólar blue:', error);
+            dolarBlueDiv.innerHTML = `<h2>Precio del Dólar Blue en Argentina</h2>
+                                      <div class="cotizacion-item">
+                                        <span>(BLUE) Compra: 0 ARS | Venta: 0 ARS</span>
+                                      </div>`;
+        });
+
 
     // Obtener y mostrar el precio del dólar cripto en pesos argentinos desde CriptoYa
     fetch(apiUrlCriptoYa)
@@ -139,34 +150,36 @@ document.addEventListener('DOMContentLoaded', () => {
         })
         .catch(error => console.error('Error al obtener el precio del dólar cripto desde CriptoYa:', error));
 
-    // Función para convertir monedas entre USD, ARS, y USDT
+    // Función para convertir monedas entre USD, ARS, y otras monedas
     convertirButton.addEventListener('click', () => {
         const monto = parseFloat(montoInput.value);
         const monedaOrigen = monedaOrigenSelect.value;
         const monedaDestino = monedaDestinoSelect.value;
         let resultado;
 
-        if (monedaOrigen === 'USD') {
-            if (monedaDestino === 'ARS') {
-                resultado = monto * tasaCambioUSDARS;
-            } else if (monedaDestino === 'USDT') {
-                resultado = monto * (tasaCambioUSDARS / dolarCriptoVenta);
-            }
-        } else if (monedaOrigen === 'ARS') {
-            if (monedaDestino === 'USD') {
-                resultado = monto / tasaCambioUSDARS;
-            } else if (monedaDestino === 'USDT') {
-                resultado = monto / dolarCriptoVenta;
-            }
-        } else if (monedaOrigen === 'USDT') {
-            if (monedaDestino === 'ARS') {
-                resultado = monto * dolarCriptoVenta;
-            } else if (monedaDestino === 'USD') {
-                resultado = monto * (dolarCriptoVenta / tasaCambioUSDARS);
-            }
+        if (monedaOrigen === 'USD' && monedaDestino === 'ARS') {
+            resultado = monto * dolarBlueVenta; // Usamos el valor del dólar blue
+        } else if (monedaOrigen === 'ARS' && monedaDestino === 'USD') {
+            resultado = monto / dolarBlueVenta; // Usamos el valor del dólar blue
+        } else if (monedaOrigen === 'USD' && monedaDestino === 'USDT') {
+            resultado = monto * (dolarBlueVenta / dolarCriptoVenta);
+        } else if (monedaOrigen === 'USDT' && monedaDestino === 'ARS') {
+            resultado = monto * dolarCriptoVenta;
+        } else if (monedaOrigen === 'ARS' && monedaDestino === 'USDT') {
+            resultado = monto / dolarCriptoVenta;
+        } else if (monedaOrigen === 'EUR' && monedaDestino === 'ARS') {
+            resultado = monto * (rates['USD'] * dolarBlueVenta / rates['EUR']);
+        } else if (monedaOrigen === 'ARS' && monedaDestino === 'EUR') {
+            resultado = monto / (rates['USD'] * dolarBlueVenta / rates['EUR']);
+        } else if (rates[monedaOrigen] && rates[monedaDestino]) {
+            resultado = monto * (rates[monedaDestino] / rates[monedaOrigen]);
         }
 
-        resultadoDiv.innerHTML = `<p>${monto} ${monedaOrigen} equivale a ${resultado.toFixed(2)} ${monedaDestino}</p>`;
+        if (resultado) {
+            resultadoDiv.innerHTML = `<p>${monto} ${monedaOrigen} equivale a ${resultado.toFixed(2)} ${monedaDestino}</p>`;
+        } else {
+            resultadoDiv.innerHTML = `<p>No se pudo realizar la conversión</p>`;
+        }
     });
 
     actualizarFavoritas();
