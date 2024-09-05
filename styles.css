@@ -236,4 +236,30 @@ input:checked + .slider:before {
     padding: 10px; /* Añadir un poco de espacio interno */
 }
 
+.curso-item {
+    width: 50%;
+    background-color: #2c2c2c; /* Fondo gris */
+    padding: 10px;
+    margin: 10px auto; /* Centrado horizontal */
+    border-radius: 8px; /* Bordes redondeados */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    text-align: center;
+   font-size: 1.3em;
+}
+.curso-precio {
+    width: 50%;
+    padding: 15px;
+    border-radius: 5px;
+    background-color: #2c2c2c; /* Fondo gris claro */
+    margin: 5px auto; /* Centrado horizontal */
+    text-align: center;
+}
+
+/* Para garantizar el centrado de todo el contenido de la sección */
+#curso-precios {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
 

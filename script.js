@@ -15,6 +15,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const montoInput = document.getElementById('monto');
     const monedaOrigenSelect = document.getElementById('moneda-origen');
     const monedaDestinoSelect = document.getElementById('moneda-destino');
+    const cursoSelect = document.getElementById('curso-select'); // Selector de cursos
+    const cursoPreciosDiv = document.getElementById('curso-precios'); // Div donde se mostrarán los precios del curso
 
     let dolarBlueVenta, dolarCriptoVenta, tasaCambioUSDARS;
     let rates = {};
@@ -31,7 +33,25 @@ document.addEventListener('DOMContentLoaded', () => {
         'EUR': 'Euro',
     };
 
+    const flagMapping = {
+        'ARS': 'ar',  // Argentina
+        'BRL': 'br',  // Brasil
+        'CLP': 'cl',  // Chile
+        'COP': 'co',  // Colombia
+        'MXN': 'mx',  // México
+        'PEN': 'pe',  // Perú
+        'UYU': 'uy',  // Uruguay
+        'USDT': 'us', // USDT (usamos la bandera de EE.UU.)
+        'EUR': 'eu',  // Euro (bandera de la Unión Europea)
+    };
+
     let favoritos = JSON.parse(localStorage.getItem('favoritos')) || {};
+
+    const cursos = [
+        { nombre: "Master Fade", precioUSD: 47 },
+        { nombre: "Focus", precioUSD: 147 },
+        { nombre: "Cutting Mastery", precioUSD: 37 }, // Nuevo curso agregado
+    ];
 
     function showTab(tabName) {
         const tabs = document.querySelectorAll('.tab-content');
@@ -71,21 +91,52 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem('favoritos', JSON.stringify(favoritos));
         actualizarFavoritas();
 
-        // Apagar el switch correspondiente
         const switchElement = document.querySelector(`input[type="checkbox"][onclick*="'${currency}'"]`);
         if (switchElement) {
             switchElement.checked = false;
         }
     }
 
-    // Obtener y mostrar cotizaciones en relación al USD
+    // Actualiza los precios cuando se selecciona un curso del select
+    function mostrarPreciosCursoSeleccionado() {
+        const selectedCourse = cursoSelect.value;
+        const curso = cursos.find(c => c.nombre === selectedCourse);
+        if (curso) {
+            cursoPreciosDiv.innerHTML = `<div class="curso-item">
+                                            <h3>${curso.nombre}</h3>
+                                            <p class="curso-precio">Precio en USD: $${curso.precioUSD}</p>`;
+
+            Object.keys(currencyNames).forEach(moneda => {
+                if (rates[moneda]) {
+                    const precioEnMoneda = (curso.precioUSD * rates[moneda]).toFixed(2);
+                    const flagCode = flagMapping[moneda];
+                    cursoPreciosDiv.innerHTML += `<p class="curso-precio">
+                        <img src="https://flagcdn.com/16x12/${flagCode}.png" alt="${currencyNames[moneda]}" style="width: 24px; height: 16px; margin-right: 10px;">
+                        Precio en ${currencyNames[moneda]} (${moneda}): ${precioEnMoneda} ${moneda}
+                    </p>`;
+                }
+            });
+            cursoPreciosDiv.innerHTML += '</div>';
+        }
+    }
+
+    // Llenar el select de cursos al cargar la página
+    function llenarSelectorCursos() {
+        cursos.forEach(curso => {
+            const option = document.createElement('option');
+            option.value = curso.nombre;
+            option.textContent = curso.nombre;
+            cursoSelect.appendChild(option);
+        });
+    }
+
     fetch(apiUrlUSD)
         .then(response => response.json())
         .then(data => {
             rates = data.conversion_rates;
             tasaCambioUSDARS = rates['ARS'];
             cotizacionesUSD.innerHTML = '<h2>Cotizaciones en relación al USD</h2>';
-            
+
             Object.keys(currencyNames).forEach(currency => {
                 if (rates[currency]) {
                     const checked = favoritos[currency] ? 'checked' : '';
@@ -98,14 +149,14 @@ document.addEventListener('DOMContentLoaded', () => {
                                                   </div>`;
                 }
             });
+
+            llenarSelectorCursos(); // Llenamos el selector de cursos al cargar las cotizaciones
         })
         .catch(error => console.error('Error al obtener cotizaciones en USD:', error));
 
-    // Obtener y mostrar el precio del dólar blue en Argentina desde CriptoYa
     fetch(apiUrlDolarBlue)
         .then(response => response.json())
         .then(data => {
-            // Accedemos a los valores de compra y venta del dólar blue desde la nueva API
             dolarBlueCompra = data.blue ? data.blue.bid : 0;
             dolarBlueVenta = data.blue ? data.blue.ask : 0;
 
@@ -129,13 +180,11 @@ document.addEventListener('DOMContentLoaded', () => {
                                       </div>`;
         });
 
-
-    // Obtener y mostrar el precio del dólar cripto en pesos argentinos desde CriptoYa
     fetch(apiUrlCriptoYa)
         .then(response => response.json())
         .then(data => {
-            const dolarCriptoCompra = data.bid; // Precio de compra
-            dolarCriptoVenta = data.ask; // Precio de venta
+            const dolarCriptoCompra = data.bid;
+            dolarCriptoVenta = data.ask;
             const dolarCriptoValue = `(USDT) Compra: ${dolarCriptoCompra} ARS | Venta: ${dolarCriptoVenta} ARS`;
             const checked = favoritos['DolarCripto'] ? 'checked' : '';
 
@@ -150,7 +199,6 @@ document.addEventListener('DOMContentLoaded', () => {
         })
         .catch(error => console.error('Error al obtener el precio del dólar cripto desde CriptoYa:', error));
 
-    // Función para convertir monedas entre USD, ARS, y otras monedas
     convertirButton.addEventListener('click', () => {
         const monto = parseFloat(montoInput.value);
         const monedaOrigen = monedaOrigenSelect.value;
@@ -158,9 +206,9 @@ document.addEventListener('DOMContentLoaded', () => {
         let resultado;
 
         if (monedaOrigen === 'USD' && monedaDestino === 'ARS') {
-            resultado = monto * dolarBlueVenta; // Usamos el valor del dólar blue
+            resultado = monto * dolarBlueVenta;
         } else if (monedaOrigen === 'ARS' && monedaDestino === 'USD') {
-            resultado = monto / dolarBlueVenta; // Usamos el valor del dólar blue
+            resultado = monto / dolarBlueVenta;
         } else if (monedaOrigen === 'USD' && monedaDestino === 'USDT') {
             resultado = monto * (dolarBlueVenta / dolarCriptoVenta);
         } else if (monedaOrigen === 'USDT' && monedaDestino === 'ARS') {
@@ -181,6 +229,8 @@ document.addEventListener('DOMContentLoaded', () => {
             resultadoDiv.innerHTML = `<p>No se pudo realizar la conversión</p>`;
         }
     });
+
+    cursoSelect.addEventListener('change', mostrarPreciosCursoSeleccionado);
 
     actualizarFavoritas();
     showTab('todos');
