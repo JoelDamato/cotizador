@@ -83,10 +83,7 @@ h4 {
     text-align: center;
 }
 
-label, select, input {
-    margin: 10px;
-    text-align: center;
-}
+
 
 .active {
     display: block;
@@ -185,3 +182,58 @@ input:checked + .slider {
 input:checked + .slider:before {
     transform: translateX(26px);
 }
+
+#convertidor {
+    display: flex;
+    flex-direction: column; /* Alinea los elementos en columna */
+    align-items: center;
+    width: 100%;
+}
+
+#convertidor label {
+    font-size: 1.2rem; /* Tamaño de fuente del label */
+    display: block;
+    margin-bottom: 2px;
+}
+
+.convertform {
+    width: 50%; /* Ajusta el ancho de los inputs y selects */
+    height: 60px;
+    font-size: 1rem; /* Tamaño del texto */
+    margin-bottom: 15px; /* Espacio entre inputs */
+    border-radius: 10px; /* Bordes redondeados */
+    border: 1px solid #ccc; /* Borde */
+    text-align: center;
+}
+
+#convertir {
+    width: 50%; /* Hace que el botón ocupe el mismo ancho que los inputs */
+    padding: 10px 20px; /* Reduce el espacio dentro del botón */
+    font-size: 1rem; /* Reduce el tamaño de fuente del botón */
+    border-radius: 8px; /* Bordes redondeados */
+    background-color: #007bff; /* Color de fondo */
+    color: white; /* Color del texto */
+    border: none; /* Sin bordes */
+    cursor: pointer; /* Cambia el cursor cuando se pasa sobre el botón */
+    margin-top: 15px; /* Espacio entre el botón y el input anterior */
+}
+
+#convertir:hover {
+    background-color: #0056b3; /* Color al pasar el mouse */
+}
+
+#resultado {
+    display: flex;
+    justify-content: center;
+    align-items: center; /* Asegura que el contenido interno esté centrado verticalmente */
+    text-align: center;
+    width: 50%; /* Ancho del contenedor */
+    font-size: 1.8rem; /* Tamaño del texto */
+    margin: 20px auto; /* Asegura que el elemento esté centrado horizontalmente */
+    border: 1px solid #ccc; /* Borde */
+    background-color: white;
+    color: black;
+    padding: 10px; /* Añadir un poco de espacio interno */
+}
+
+
