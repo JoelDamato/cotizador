@@ -132,13 +132,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     let precioEnMonedaMasterFade, precioEnMonedaCutting, precioEnMonedaOferta;
 
                     if (moneda === 'ARS') { // Precio fijo para Argentina
-                        precioEnMonedaMasterFade = (47000).toFixed(2);
-                        precioEnMonedaCutting = (37000).toFixed(2);
-                        precioEnMonedaOferta = (66000).toFixed(2);
+                        precioEnMonedaMasterFade = 47000;
+                        precioEnMonedaCutting = 37000;
+                        precioEnMonedaOferta = 66000;
+                        
                     } else {
-                        precioEnMonedaMasterFade = (precioMasterFadeUSD * rates[moneda]).toFixed(2);
-                        precioEnMonedaCutting = (precioCuttingUSD * rates[moneda]).toFixed(2);
-                        precioEnMonedaOferta = (precioOfertaUSD * rates[moneda]).toFixed(2);
+                        precioEnMonedaMasterFade = Math.floor(precioMasterFadeUSD * rates[moneda]);
+                        precioEnMonedaCutting = Math.floor(precioCuttingUSD * rates[moneda]);
+                        precioEnMonedaOferta = Math.floor(precioOfertaUSD * rates[moneda]);
+                        
                     }
 
                     const flagCode = flagMapping[moneda];
@@ -176,9 +178,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     let precioEnMonedaFocus;
 
                     if (moneda === 'ARS') {
-                        precioEnMonedaFocus = (97000).toFixed(2);
+                        precioEnMonedaFocus = 97000
                     } else {
-                        precioEnMonedaFocus = (precioFocusUSD * rates[moneda]).toFixed(2);
+                        precioEnMonedaFocus = Math.floor(precioFocusUSD * rates[moneda]);
+
                     }
 
                     const flagCode = flagMapping[moneda];
