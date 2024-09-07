@@ -211,26 +211,20 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function copiarTexto(texto) {
-        if (navigator.clipboard) {
-            navigator.clipboard.writeText(texto).then(() => {
-                alert('Texto copiado: \n' + texto);
-            }).catch(err => {
-                console.error('Error al copiar el texto: ', err);
-            });
-        } else {
-            const textarea = document.createElement('textarea');
-            textarea.value = texto;
-            document.body.appendChild(textarea);
-            textarea.select();
-            try {
-                document.execCommand('copy');
-                alert('Texto copiado: \n' + texto);
-            } catch (err) {
-                console.error('Error al copiar el texto: ', err);
-            }
-            document.body.removeChild(textarea);
+        const textarea = document.createElement('textarea');
+        textarea.value = texto;
+        document.body.appendChild(textarea);
+        textarea.select();
+        try {
+            document.execCommand('copy');
+            alert('Texto copiado: \n' + texto);
+        } catch (err) {
+            console.error('Error al copiar el texto: ', err);
+            alert('No se pudo copiar el texto. Por favor, copia manualmente.');
         }
+        document.body.removeChild(textarea);
     }
+    
 
     // Llenar el select de cursos al cargar la página
     function llenarSelectorCursos() {
