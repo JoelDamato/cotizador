@@ -243,28 +243,35 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     fetch(apiUrlUSD)
-        .then(response => response.json())
-        .then(data => {
-            rates = data.conversion_rates;
-            tasaCambioUSDARS = rates['ARS'];
-            cotizacionesUSD.innerHTML = '<h2>Cotizaciones en relación al USD</h2>';
+    .then(response => response.json())
+    .then(data => {
+        rates = data.conversion_rates;
+        tasaCambioUSDARS = rates['ARS'];
+        cotizacionesUSD.innerHTML = '<h2>Cotizaciones en relación al USD</h2>';
 
-            Object.keys(currencyNames).forEach(currency => {
-                if (rates[currency]) {
-                    const checked = favoritos[currency] ? 'checked' : '';
-                    cotizacionesUSD.innerHTML += `<div class="cotizacion-item">
-                                                    <span> $${rates[currency]} ${currencyNames[currency]} = 1 USD </span> 
-                                                    <label class="switch">
-                                                      <input type="checkbox" ${checked} onclick="toggleFavorito('${currency}', '${currencyNames[currency]} (${currency}): ${rates[currency]}')">
-                                                      <span class="slider"></span>
-                                                    </label>
-                                                  </div>`;
-                }
-            });
+        Object.keys(currencyNames).forEach(currency => {
+            if (rates[currency]) {
+                const checked = favoritos[currency] ? 'checked' : '';
+                
+                // Agregamos la bandera utilizando el código del país
+                const countryCode = currency.slice(0, 2).toLowerCase();  // Obtener los primeros 2 caracteres del código de moneda
+                const flagUrl = `https://flagcdn.com/24x18/${countryCode}.png`;  // URL de la bandera
 
-            llenarSelectorCursos(); // Llenar los cursos al cargar la página
-        })
-        .catch(error => console.error('Error al obtener cotizaciones en USD:', error));
+                cotizacionesUSD.innerHTML += `<div class="cotizacion-item">
+                                                <img src="${flagUrl}" alt="Bandera de ${currencyNames[currency]}" width="24" height="18">
+                                                <span> ${currencyNames[currency]} $${rates[currency]}  = 1 USD </span> 
+                                                <label class="switch">
+                                                  <input type="checkbox" ${checked} onclick="toggleFavorito('${currency}', '${currencyNames[currency]} (${currency}): ${rates[currency]}')">
+                                                  <span class="slider"></span>
+                                                </label>
+                                              </div>`;
+            }
+        });
+
+        llenarSelectorCursos(); // Llenar los cursos al cargar la página
+    })
+    .catch(error => console.error('Error al obtener cotizaciones en USD:', error));
+
 
     fetch(apiUrlDolarBlue)
         .then(response => response.json())
