@@ -113,12 +113,21 @@ h4 {
     z-index: 1; /* Establece el nivel de las pestañas */
     position: relative;
     padding: 20px;
+    width: 100%; /* Ocupará todo el ancho disponible */
+    box-sizing: border-box; /* Asegura que el padding esté incluido en el ancho */
+    text-align: center; /* Centra el contenido dentro de la pestaña */
 }
 
 .tab-content.active {
     display: block; /* Solo la pestaña activa se muestra */
     z-index: 2;
 }
+
+.tab-content > * {
+    margin: 0 auto; /* Centra los elementos hijos */
+    max-width: 1200px; /* Establece un ancho máximo para el contenido */
+}
+
 
 .cur {
     display: flex;
@@ -137,23 +146,6 @@ h4 {
     text-align: center;
 }
 
-.column {
-    flex: 1;
-    width: 60%;
-    box-sizing: border-box;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-    background-color: #004AAD;
-    color: white;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
-    border: none;
-    margin: 0 auto;
-    text-align: center;
-}
 
 #cotizaciones-usd, #cotizaciones-ars, #dolar-blue, #dolar-cripto, #favoritas-list {
     display: flex;
@@ -177,21 +169,6 @@ h4 {
 
 .cotizacion-item {
     width: 500px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px;
-    background: linear-gradient(to bottom,#191919,  #000000);
-    border-radius: 8px;
-    margin-bottom: 10px;
-    box-sizing: border-box;
-    text-align: center;
-    color: white;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
-}
-
-.cotizacion-item1 {
-    width: 95%;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -349,15 +326,18 @@ input:checked + .slider:before {
     width: 100%;
 }
 
-/* Estilo del contenedor del dólar */
 .dolar-container {
     display: flex;
-    justify-content: center;
-    gap: 20px;
+    flex-direction: column; /* Cambia la dirección del layout de horizontal a vertical */
+    gap: 10px; /* Reduce el espacio entre los elementos en móviles */
+    width: 100%;
+    justify-content: center; /* Centra los elementos verticalmente si es necesario */
+    align-items: center; /* Centra los elementos horizontalmente */
 }
 
-#dolar-blue, #dolar-cripto {
-    width: 18%;
+
+#dolar-blue, #dolar-cripto, #cotizaciones-usd, #cursos-disponibles {
+    width: 50%;
     background-color: #004AAD;
     color: white;
     padding: 10px;
@@ -536,28 +516,38 @@ input:checked + .slider:before {
         width: 90%; /* Ajuste del ancho para móviles */
     }
 
-    #dolar-blue, #dolar-cripto {
+    #dolar-blue, #dolar-cripto, #cotizaciones-usd, #cursos-disponibles {
         width: 95%; /* Ajusta el ancho a un 90% en móviles */
         margin-left: 0;
         margin-right: 0;
     }
 
-    .dolar-container {
-        flex-direction: column; /* Cambia la dirección del layout de horizontal a vertical */
-        gap: 10px; /* Reduce el espacio entre los elementos en móviles */
-        width: 100%;
-    }
 
-    .column {
-    
-        width: 97%;
-        text-align: center;
-    }
+
     .tab-content {
         width: 100%; /* Ocupa el 100% del ancho en móviles */
         padding: 10px; /* Ajusta el padding en móviles para un mejor ajuste */
         margin: 0; /* Elimina el margen */
-    }
+ 
+   }
+   .curso-precio {
+    width: 90%; /* Mantén un margen en los laterales en móviles */
+    padding: 8px;
+}
+
+#curso-precios {
+    padding: 10px; /* Reduce el padding general en móviles */
+}
+
+#curso-precios h3 {
+    font-size: 14px; /* Reduce aún más el tamaño de la fuente */
+}
+
+#curso-precios p {
+    font-size: 12px; /* Tamaño de texto más pequeño para pantallas móviles */
+}
+}
+
 }
 
 

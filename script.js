@@ -358,7 +358,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             dolarBlueDiv.innerHTML = `<h2 style="color:white; font-weight: bold;">Dólar Blue</h2>
 
-                                      <div class="cotizacion-item1">
+                                      <div class="cotizacion-item">
                                         <span>${dolarBlueValue}  </span>
                                         <label class="switch">
                                           <input type="checkbox" ${checked} onclick="toggleFavorito('DolarBlue', 'Dolar Blue: ${dolarBlueValue}')">
@@ -369,7 +369,7 @@ document.addEventListener('DOMContentLoaded', () => {
         .catch(error => {
             console.error('Error al obtener el precio del dólar blue:', error);
             dolarBlueDiv.innerHTML = `<h2>Dólar Blue</h2>
-                                      <div class="cotizacion-item1">
+                                      <div class="cotizacion-item">
                                         <span>(BLUE) Compra: 0 ARS | Venta: 0 ARS</span>
                                       </div>`;
         });
@@ -384,7 +384,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             dolarCriptoDiv.innerHTML = `<h2 style="color:white; font-weight: bold;">Dólar Cripto</h2>
 
-                                        <div class="cotizacion-item1">
+                                        <div class="cotizacion-item">
                                           <span>${dolarCriptoValue}  </span>
                                           <label class="switch">
                                             <input type="checkbox" ${checked} onclick="toggleFavorito('DolarCripto', 'Dolar Cripto: ${dolarCriptoValue}')">
