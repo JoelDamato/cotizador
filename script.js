@@ -1,7 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     const apiKey = '5bc1cec6967623eb3dcfbc4a';
     const apiUrlUSD = `https://v6.exchangerate-api.com/v6/${apiKey}/latest/USD`;
-    const apiUrlARS = `https://v6.exchangerate-api.com/v6/${apiKey}/latest/ARS`;
     const apiUrlDolarBlue = 'https://criptoya.com/api/dolar';
     const apiUrlCriptoYa = 'https://criptoya.com/api/binancep2p/USDT/ARS/1';
 
@@ -22,25 +21,27 @@ document.addEventListener('DOMContentLoaded', () => {
     let rates = {};
 
     const currencyNames = {
+        'EUR': 'Euro',
         'ARS': 'Peso Argentino',
+        'UYU': 'Peso Uruguayo',
         'BRL': 'Real Brasileño',
         'CLP': 'Peso Chileno',
         'COP': 'Peso Colombiano',
         'MXN': 'Peso Mexicano',
         'PEN': 'Sol Peruano',
-        'UYU': 'Peso Uruguayo',
-        'EUR': 'Euro',
+        'VES': 'Bolívar Venezolano',
     };
 
     const flagMapping = {
+        'EUR': 'eu',
         'ARS': 'ar',
+        'UYU': 'uy',
         'BRL': 'br',
         'CLP': 'cl',
         'COP': 'co',
         'MXN': 'mx',
         'PEN': 'pe',
-        'UYU': 'uy',
-        'EUR': 'eu',
+        'VES': 've' 
     };
 
     let favoritos = JSON.parse(localStorage.getItem('favoritos')) || {};
@@ -51,6 +52,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const cursos = [
         { nombre: "Master Fade", precios: { regularMasterFade: 47, regularCutting: 37, ofertaPorHoy: 66 } },
         { nombre: "Focus", precioUSD: 147 }
+    ];
+
+    const cursosDownsell = [
+        { nombre: "Master Fade", precios: { regularMasterFade: 29, regularCutting: 19, ofertaPorHoy: 44 } },
+        { nombre: "Focus", precioUSD: 97 }
     ];
 
     function showTab(tabName) {
@@ -104,7 +110,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function mostrarPreciosCursoSeleccionado() {
         const selectedCourse = cursoSelect.value;
-        const curso = cursos.find(c => c.nombre === selectedCourse);
+        const curso = cursos.find(c => c.nombre === selectedCourse) || cursosDownsell.find(c => c.nombre === selectedCourse);
 
         if (!curso) {
             console.error('No se encontró el curso seleccionado.');
@@ -114,103 +120,178 @@ document.addEventListener('DOMContentLoaded', () => {
         // Limpiamos el div donde mostraremos los precios
         cursoPreciosDiv.innerHTML = '';
 
-        if (selectedCourse === "Master Fade") {
-            let precioMasterFadeUSD = curso.precios.regularMasterFade;
-            let precioCuttingUSD = curso.precios.regularCutting;
-            let precioOfertaUSD = curso.precios.ofertaPorHoy;
+        // Crear el select para elegir entre Regular y Downsell
+        cursoPreciosDiv.innerHTML = `
+        <label for="tipo-precio" style="
+        font-size: 16px; 
+        color: white;
+        font-weight: bold;
+        display: block;
+        margin-bottom: 10px; /* Espacio debajo del label */
+    ">
+        Seleccione el tipo de precio:
+    </label>
+    
+    <select id="tipo-precio" style="
+        width: 50%; /* Ancho completo */
+        padding: 10px; /* Espacio interno */
+        font-size: 16px; /* Tamaño de la fuente */
+        border: 2px solid black; /* Borde azul */
+        border-radius: 5px; /* Bordes redondeados */
+        background-color: #f0f0f0; /* Fondo gris claro */
+        color: black; /* Color del texto */
+        margin-bottom: 20px; /* Espacio debajo del select */
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Sombra */
+        text-align: center; /* Centra el texto */
+    ">
+        <option value="regular">Regular</option>
+        <option value="downsell">Downsell</option>
+    </select>
+            <div id="precios-contenido"></div>
+        `;
 
-            cursoPreciosDiv.innerHTML = `
-            <div style="width: 100%;  color: white; padding: 10px; border-radius: 10px;">
-                    <h3>${curso.nombre}</h3>
-                    <p>Precio regular Master Fade: $${precioMasterFadeUSD} USD</p>
-                    <p>Precio regular Cutting Mastery: $${precioCuttingUSD} USD</p>
-                    <p>Precio oferta por hoy: $${precioOfertaUSD} USD</p>
-                    <div id="precios-convertidos">`;
+        const tipoPrecioSelect = document.getElementById('tipo-precio');
+        const preciosContenidoDiv = document.getElementById('precios-contenido');
 
-            Object.keys(currencyNames).forEach(moneda => {
-                if (rates[moneda] && moneda !== 'USD' && moneda !== 'USDT') {  // Ignoramos USD y USDT
-                    let precioEnMonedaMasterFade, precioEnMonedaCutting, precioEnMonedaOferta;
+        // Función para actualizar los precios según la opción seleccionada
+        function actualizarPrecios() {
+            const tipoPrecio = tipoPrecioSelect.value;
+            preciosContenidoDiv.innerHTML = '';
 
-                    if (moneda === 'ARS') { // Precio fijo para Argentina
-                        precioEnMonedaMasterFade = 47000;
-                        precioEnMonedaCutting = 37000;
-                        precioEnMonedaOferta = 66000;
-                        
-                    } else {
-                        precioEnMonedaMasterFade = Math.floor(precioMasterFadeUSD * rates[moneda]);
-                        precioEnMonedaCutting = Math.floor(precioCuttingUSD * rates[moneda]);
-                        precioEnMonedaOferta = Math.floor(precioOfertaUSD * rates[moneda]);
-                        
+            let precios;
+            if (tipoPrecio === 'regular') {
+                precios = cursos.find(c => c.nombre === selectedCourse).precios;
+            } else if (tipoPrecio === 'downsell') {
+                precios = cursosDownsell.find(c => c.nombre === selectedCourse).precios;
+            }
+
+            let precioUSD = curso.precioUSD || precios.regularMasterFade;
+
+            if (selectedCourse === "Master Fade") {
+                let precioMasterFadeUSD = precios.regularMasterFade;
+                let precioCuttingUSD = precios.regularCutting;
+                let precioOfertaUSD = precios.ofertaPorHoy;
+
+                // Mostrar los precios en la interfaz
+                preciosContenidoDiv.innerHTML += `
+                <div style="
+                background-color: #004AAD; /* Fondo azul sólido */
+                border-radius: 10px; 
+                width: 80%; 
+                color: white; /* Texto blanco */
+                padding: 10px; 
+                margin: 10px auto 10px auto; /* Centrado horizontal y 10px de margen inferior */
+                text-align: center;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5); /* Sombra alrededor */
+            ">                    <h3>${selectedCourse} - ${tipoPrecio.charAt(0).toUpperCase() + tipoPrecio.slice(1)}</h3>
+                    <p>Precio regular Master Fade: $${precioMasterFadeUSD.toFixed(2)} USD</p>
+                    <p>Precio regular Cutting Mastery: $${precioCuttingUSD.toFixed(2)} USD</p>
+                    <p>Precio oferta por hoy: $${precioOfertaUSD.toFixed(2)} USD</p>
+                    <div id="precios-convertidos"></div>
+                `;
+
+                Object.keys(currencyNames).forEach(moneda => {
+                    if (rates[moneda] && moneda !== 'USD' && moneda !== 'USDT') {
+                        let precioEnMonedaMasterFade, precioEnMonedaCutting, precioEnMonedaOferta;
+
+                        if (moneda === 'ARS') {
+                            precioEnMonedaMasterFade = tipoPrecio === 'regular' ? 47000 : 25000;
+                            precioEnMonedaCutting = tipoPrecio === 'regular' ? 37000 : 17000;
+                            precioEnMonedaOferta = tipoPrecio === 'regular' ? 66000 : 39000;
+                        } else if (moneda === 'UYU') {
+                            precioEnMonedaMasterFade = tipoPrecio === 'regular' ? 1900 : 1000;
+                            precioEnMonedaCutting = tipoPrecio === 'regular' ? 1700 : 790;
+                            precioEnMonedaOferta = tipoPrecio === 'regular' ? 2700 : 1500;
+                        } else {
+                            precioEnMonedaMasterFade = Math.floor(precioMasterFadeUSD * rates[moneda]).toLocaleString();
+                            precioEnMonedaCutting = Math.floor(precioCuttingUSD * rates[moneda]).toLocaleString();
+                            precioEnMonedaOferta = Math.floor(precioOfertaUSD * rates[moneda]).toLocaleString();
+                        }
+
+                        const flagCode = flagMapping[moneda];
+                        const textoParaCopiar = `Precio regular Master Fade $${precioEnMonedaMasterFade} ${moneda}\n` +
+                                                `Precio regular Cutting Mastery $${precioEnMonedaCutting} ${moneda}\n` +
+                                                `Precio ESPECIAL DE HOY ! Master Fade + Cutting por $${precioEnMonedaOferta} ${moneda}`;
+
+                        preciosContenidoDiv.innerHTML += `
+                            <div class="curso-precio" style="margin-bottom: 2px; width: 500px; ">
+                                <img src="https://flagcdn.com/16x12/${flagCode}.png" alt="${currencyNames[moneda]}" style="width: 20px; height: 14px; margin-right: 5px;">
+                                <strong>${currencyNames[moneda]} (${moneda}):</strong><br>
+                                - Precio regular Master Fade: $${precioEnMonedaMasterFade} ${moneda}<br>
+                                - Precio regular Cutting Mastery: $${precioEnMonedaCutting} ${moneda}<br>
+                                - Precio oferta por hoy: $${precioEnMonedaOferta} ${moneda}<br>
+                                <button class="copy-btn" style="margin-top: 5px; padding: 5px 10px; background-color: #007BFF; color: white; border: none; border-radius: 5px; cursor: pointer;" data-precio="${textoParaCopiar}">
+                                    Copiar precios de ${currencyNames[moneda]}
+                                </button>
+                            </div>`;
                     }
+                });
 
-                    const flagCode = flagMapping[moneda];
+                preciosContenidoDiv.innerHTML += '</div>';
+            } else if (selectedCourse === "Focus") {
+                let precioFocusUSD = curso.precioUSD;
 
-                    const textoParaCopiar = `- Precio regular Master Fade: $${precioEnMonedaMasterFade} ${moneda}\n` +
-                                            `- Precio regular Cutting Mastery: $${precioEnMonedaCutting} ${moneda}\n` +
-                                            `- Precio OFERTA DE HOY ! Master Fade + Cutting por: $${precioEnMonedaOferta} ${moneda}`;
-
-                    cursoPreciosDiv.innerHTML += `
-                        <div class="curso-precio" style="margin-bottom: 2px;">
-                            <img src="https://flagcdn.com/16x12/${flagCode}.png" alt="${currencyNames[moneda]}" style="width: 20px; height: 14px; margin-right: 5px;">
-                            <strong>${currencyNames[moneda]} (${moneda}):</strong><br>
-                            - Precio regular Master Fade: $${precioEnMonedaMasterFade} ${moneda}<br>
-                            - Precio regular Cutting Mastery: $${precioEnMonedaCutting} ${moneda}<br>
-                            - Precio oferta por hoy: $${precioEnMonedaOferta} ${moneda}<br>
-                            <button class="copy-btn" style="margin-top: 5px; padding: 5px 10px; background-color: #007BFF; color: white; border: none; border-radius: 5px; cursor: pointer;" data-precio="${textoParaCopiar}">
-                                Copiar precios de ${currencyNames[moneda]}
-                            </button>
-                        </div>`;
+                if (tipoPrecio === 'downsell') {
+                    precioFocusUSD = cursosDownsell.find(c => c.nombre === selectedCourse).precioUSD;
                 }
-            });
 
-            cursoPreciosDiv.innerHTML += '</div>';
-        } else if (selectedCourse === "Focus") {
-            let precioFocusUSD = curso.precioUSD;
+                // Mostrar precios de Focus
+                preciosContenidoDiv.innerHTML = `
+                <div style="
+                background-color: #004AAD; /* Fondo azul sólido */
+                border-radius: 10px; 
+                width: 80%; 
+                color: white; /* Texto blanco */
+                padding: 10px; 
+                margin: 10px auto 10px auto; /* Centrado horizontal y 10px de margen inferior */
+                text-align: center;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5); /* Sombra alrededor */
+            ">
+                <!-- Contenido del div -->
+           
+            
+                        <h3 >${selectedCourse} - ${tipoPrecio.charAt(0).toUpperCase() + tipoPrecio.slice(1)}</h3>
+                        <p>Precio en USD: $${precioFocusUSD.toFixed(2)} USD</p>
+                        <div id="precios-convertidos">`;
 
-            cursoPreciosDiv.innerHTML = `
-                <div style="width: 100%;  color: white; padding: 10px; border-radius: 10px;">
-                    <h3>${curso.nombre}</h3>
-                    <p>Precio en USD: $${precioFocusUSD} USD</p>
-                    <div id="precios-convertidos">`;
-
-            Object.keys(currencyNames).forEach(moneda => {
-                if (rates[moneda] && moneda !== 'USD' && moneda !== 'USDT') {
-                    let precioEnMonedaFocus;
-
+                Object.keys(currencyNames).forEach(moneda => {
+                    let precioEnMoneda;
                     if (moneda === 'ARS') {
-                        precioEnMonedaFocus = 97000
+                        precioEnMoneda = tipoPrecio === 'regular' ? 97000 : 67000;
+                    } else if (moneda === 'UYU') {
+                        precioEnMoneda = tipoPrecio === 'regular' ? 5900 : 3800;
                     } else {
-                        precioEnMonedaFocus = Math.floor(precioFocusUSD * rates[moneda]);
-
+                        precioEnMoneda = Math.floor(precioFocusUSD * rates[moneda]).toLocaleString();
                     }
 
                     const flagCode = flagMapping[moneda];
+                    const textoParaCopiar = `Precio Focus: $${precioEnMoneda} ${moneda}`;
 
-                    const textoParaCopiar = `- Precio Focus: $${precioEnMonedaFocus} ${moneda}`;
-
-                    cursoPreciosDiv.innerHTML += `
-                        <div class="curso-precio" style="margin-bottom: 2px;">
+                    preciosContenidoDiv.innerHTML += `
+                        <div class="curso-precio" style="width: 500px; margin-bottom: 2px;">
                             <img src="https://flagcdn.com/16x12/${flagCode}.png" alt="${currencyNames[moneda]}" style="width: 20px; height: 14px; margin-right: 5px;">
                             <strong>${currencyNames[moneda]} (${moneda}):</strong><br>
-                            - Precio Focus: $${precioEnMonedaFocus} ${moneda}<br>
+                            - Precio Focus: $${precioEnMoneda} ${moneda}<br>
                             <button class="copy-btn" style="margin-top: 5px; padding: 5px 10px; background-color: #007BFF; color: white; border: none; border-radius: 5px; cursor: pointer;" data-precio="${textoParaCopiar}">
                                 Copiar precios de ${currencyNames[moneda]}
                             </button>
                         </div>`;
-                }
-            });
+                });
 
-            cursoPreciosDiv.innerHTML += '</div>';
+                preciosContenidoDiv.innerHTML += '</div>';
+            }
+
+            // Añadir evento click para copiar texto
+            preciosContenidoDiv.querySelectorAll('.copy-btn').forEach(button => {
+                button.addEventListener('click', (event) => {
+                    const textoParaCopiar = event.target.getAttribute('data-precio');
+                    copiarTexto(textoParaCopiar);
+                });
+            });
         }
 
-        // Añadir funcionalidad para copiar texto
-        const copyButtons = document.querySelectorAll('.copy-btn');
-        copyButtons.forEach(button => {
-            button.addEventListener('click', (event) => {
-                const textoParaCopiar = event.target.getAttribute('data-precio');
-                copiarTexto(textoParaCopiar);
-            });
-        });
+        tipoPrecioSelect.addEventListener('change', actualizarPrecios);
+        actualizarPrecios();
     }
 
     function copiarTexto(texto) {
@@ -227,7 +308,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         document.body.removeChild(textarea);
     }
-    
 
     // Llenar el select de cursos al cargar la página
     function llenarSelectorCursos() {
@@ -244,15 +324,13 @@ document.addEventListener('DOMContentLoaded', () => {
     .then(data => {
         rates = data.conversion_rates;
         tasaCambioUSDARS = rates['ARS'];
-        cotizacionesUSD.innerHTML = '<h2>Cotizaciones en relación al USD</h2>';
+        cotizacionesUSD.innerHTML = '<h2 style="color:white; font-weight: bold;"> Cotizaciones en relación al USD</h2>';
 
         Object.keys(currencyNames).forEach(currency => {
             if (rates[currency]) {
                 const checked = favoritos[currency] ? 'checked' : '';
-                
-                // Agregamos la bandera utilizando el código del país
-                const countryCode = currency.slice(0, 2).toLowerCase();  // Obtener los primeros 2 caracteres del código de moneda
-                const flagUrl = `https://flagcdn.com/24x18/${countryCode}.png`;  // URL de la bandera
+                const countryCode = currency.slice(0, 2).toLowerCase();  
+                const flagUrl = `https://flagcdn.com/24x18/${countryCode}.png`;  
 
                 cotizacionesUSD.innerHTML += `<div class="cotizacion-item">
                                                 <img src="${flagUrl}" alt="Bandera de ${currencyNames[currency]}" width="24" height="18">
@@ -265,10 +343,9 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        llenarSelectorCursos(); // Llenar los cursos al cargar la página
+        llenarSelectorCursos();
     })
     .catch(error => console.error('Error al obtener cotizaciones en USD:', error));
-
 
     fetch(apiUrlDolarBlue)
         .then(response => response.json())
@@ -276,22 +353,23 @@ document.addEventListener('DOMContentLoaded', () => {
             dolarBlueCompra = data.blue ? data.blue.bid : 0;
             dolarBlueVenta = data.blue ? data.blue.ask : 0;
 
-            const dolarBlueValue = `(BLUE) Compra: ${dolarBlueCompra} ARS | Venta: ${dolarBlueVenta} ARS`;
+            const dolarBlueValue = `Compra: ${dolarBlueCompra} ARS | Venta: ${dolarBlueVenta} ARS`;
             const checked = favoritos['DolarBlue'] ? 'checked' : '';
 
-            dolarBlueDiv.innerHTML = `<h2>Precio del Dólar Blue en Argentina</h2>
-                                      <div class="cotizacion-item">
+            dolarBlueDiv.innerHTML = `<h2 style="color:white; font-weight: bold;">Dólar Blue</h2>
+
+                                      <div class="cotizacion-item1">
                                         <span>${dolarBlueValue}  </span>
                                         <label class="switch">
-                                          <input type="checkbox" ${checked} onclick="toggleFavorito('DolarBlue', '${dolarBlueValue}')">
+                                          <input type="checkbox" ${checked} onclick="toggleFavorito('DolarBlue', 'Dolar Blue: ${dolarBlueValue}')">
                                           <span class="slider"></span>
                                         </label>
                                       </div>`;
         })
         .catch(error => {
             console.error('Error al obtener el precio del dólar blue:', error);
-            dolarBlueDiv.innerHTML = `<h2>Precio del Dólar Blue en Argentina</h2>
-                                      <div class="cotizacion-item">
+            dolarBlueDiv.innerHTML = `<h2>Dólar Blue</h2>
+                                      <div class="cotizacion-item1">
                                         <span>(BLUE) Compra: 0 ARS | Venta: 0 ARS</span>
                                       </div>`;
         });
@@ -301,14 +379,15 @@ document.addEventListener('DOMContentLoaded', () => {
         .then(data => {
             const dolarCriptoCompra = data.bid;
             dolarCriptoVenta = data.ask;
-            const dolarCriptoValue = `(USDT) Compra: ${dolarCriptoCompra} ARS | Venta: ${dolarCriptoVenta} ARS`;
+            const dolarCriptoValue = `Compra: ${dolarCriptoCompra} ARS | Venta: ${dolarCriptoVenta} ARS`;
             const checked = favoritos['DolarCripto'] ? 'checked' : '';
 
-            dolarCriptoDiv.innerHTML = `<h2>Precio del Dólar Cripto (USDT) en Binance P2P</h2>
-                                        <div class="cotizacion-item">
+            dolarCriptoDiv.innerHTML = `<h2 style="color:white; font-weight: bold;">Dólar Cripto</h2>
+
+                                        <div class="cotizacion-item1">
                                           <span>${dolarCriptoValue}  </span>
                                           <label class="switch">
-                                            <input type="checkbox" ${checked} onclick="toggleFavorito('DolarCripto', '${dolarCriptoValue}')">
+                                            <input type="checkbox" ${checked} onclick="toggleFavorito('DolarCripto', 'Dolar Cripto: ${dolarCriptoValue}')">
                                             <span class="slider"></span>
                                           </label>
                                         </div>`;
@@ -340,8 +419,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (resultado) {
+            resultadoDiv.style.display = 'block'; // Mostrar el div de resultado
             resultadoDiv.innerHTML = `<p>${monto} ${monedaOrigen} equivale a ${resultado.toFixed(2)} ${monedaDestino}</p>`;
         } else {
+            resultadoDiv.style.display = 'block'; // Mostrar el div incluso si hay un error
             resultadoDiv.innerHTML = `<p>No se pudo realizar la conversión</p>`;
         }
     });
@@ -355,3 +436,33 @@ document.addEventListener('DOMContentLoaded', () => {
     window.toggleFavorito = toggleFavorito;
     window.eliminarFavorito = eliminarFavorito;
 });
+
+function showTab(tabName, index) {
+    // Ocultar todas las pestañas
+    var tabs = document.querySelectorAll('.tab-content');
+    tabs.forEach(tab => {
+        tab.style.display = 'none';
+    });
+
+    // Mostrar la pestaña seleccionada
+    document.getElementById(tabName).style.display = 'block';
+
+    // Quitar la clase 'active' de todos los items del menú
+    var allMenuItems = document.querySelectorAll('.navigation ul li');
+    allMenuItems.forEach(item => {
+        item.classList.remove('active');
+    });
+
+    // Añadir la clase 'active' al elemento seleccionado
+    var selectedMenuItem = document.querySelectorAll('.navigation ul li')[index];
+    selectedMenuItem.classList.add('active');
+
+    // Actualizar la posición del indicador
+    var indicator = document.querySelector('.indicator');
+    indicator.style.transform = `translateX(${index * 70}px)`;  // Mueve el indicador al ítem correcto
+
+    // Limpiar el contenido de la pestaña de cursos cuando cambies de pestaña
+    if (tabName !== 'cursos') {
+        document.getElementById('curso-precios').innerHTML = '';
+    }
+}
