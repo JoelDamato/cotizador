@@ -529,18 +529,9 @@ input:checked + .slider:before {
     }
 }
 
-@media screen and (max-width: 768px) {
-    .cur {
-        width: 70%; /* Ajuste del ancho para tablets y dispositivos medianos */
-    }
 
-        #dolar-blue, #dolar-cripto {
-            width: 40%; /* Ajusta el ancho a un 40% en tablets */
-        }
 
-}
-
-@media screen and (max-width: 480px) {
+@media screen and (max-width: 1000px) {
     .cur {
         width: 90%; /* Ajuste del ancho para móviles */
     }
@@ -559,7 +550,7 @@ input:checked + .slider:before {
 
     .column {
     
-        width: 100%;
+        width: 97%;
         text-align: center;
     }
     .tab-content {
