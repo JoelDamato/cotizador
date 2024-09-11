@@ -530,24 +530,23 @@ input:checked + .slider:before {
         margin: 0; /* Elimina el margen */
  
    }
-   .curso-precio {
-    width: 90%; /* Mantén un margen en los laterales en móviles */
-    padding: 8px;
+ .curso-precio {
+        width: 90%; /* Mantén un margen en los laterales en móviles */
+        padding: 8px;
+    }
+
+    #curso-precios {
+        padding: 10px; /* Reduce el padding general en móviles */
+    }
+
+    #curso-precios h3 {
+        font-size: 14px; /* Reduce aún más el tamaño de la fuente */
+    }
+
+    #curso-precios p {
+        font-size: 12px; /* Tamaño de texto más pequeño para pantallas móviles */
+    }
 }
 
-#curso-precios {
-    padding: 10px; /* Reduce el padding general en móviles */
-}
-
-#curso-precios h3 {
-    font-size: 14px; /* Reduce aún más el tamaño de la fuente */
-}
-
-#curso-precios p {
-    font-size: 12px; /* Tamaño de texto más pequeño para pantallas móviles */
-}
-}
-
-}
 
 

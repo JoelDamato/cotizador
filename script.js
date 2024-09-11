@@ -174,16 +174,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 // Mostrar los precios en la interfaz
                 preciosContenidoDiv.innerHTML += `
-                <div style="
-                background-color: #004AAD; /* Fondo azul sólido */
-                border-radius: 10px; 
-                width: 80%; 
-                color: white; /* Texto blanco */
-                padding: 10px; 
-                margin: 10px auto 10px auto; /* Centrado horizontal y 10px de margen inferior */
-                text-align: center;
-                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5); /* Sombra alrededor */
-            ">                    <h3>${selectedCourse} - ${tipoPrecio.charAt(0).toUpperCase() + tipoPrecio.slice(1)}</h3>
+                <div id="cursos-disponibles">                    <h3>${selectedCourse} - ${tipoPrecio.charAt(0).toUpperCase() + tipoPrecio.slice(1)}</h3>
                     <p>Precio regular Master Fade: $${precioMasterFadeUSD.toFixed(2)} USD</p>
                     <p>Precio regular Cutting Mastery: $${precioCuttingUSD.toFixed(2)} USD</p>
                     <p>Precio oferta por hoy: $${precioOfertaUSD.toFixed(2)} USD</p>
