@@ -542,11 +542,11 @@ input:checked + .slider:before {
 
 @media screen and (max-width: 480px) {
     .cur {
-        width: 100%; /* Ajuste del ancho para móviles */
+        width: 90%; /* Ajuste del ancho para móviles */
     }
 
     #dolar-blue, #dolar-cripto {
-        width: 100%; /* Ajusta el ancho a un 90% en móviles */
+        width: 95%; /* Ajusta el ancho a un 90% en móviles */
         margin-left: 0;
         margin-right: 0;
     }
@@ -554,14 +554,19 @@ input:checked + .slider:before {
     .dolar-container {
         flex-direction: column; /* Cambia la dirección del layout de horizontal a vertical */
         gap: 10px; /* Reduce el espacio entre los elementos en móviles */
+        width: 100%;
     }
 
     .column {
-     
+    
         width: 100%;
         text-align: center;
     }
-
+    .tab-content {
+        width: 100%; /* Ocupa el 100% del ancho en móviles */
+        padding: 10px; /* Ajusta el padding en móviles para un mejor ajuste */
+        margin: 0; /* Elimina el margen */
+    }
 }
 
 
