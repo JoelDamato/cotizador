@@ -202,9 +202,9 @@ document.addEventListener('DOMContentLoaded', () => {
                             precioEnMonedaCutting = tipoPrecio === 'regular' ? 1700 : 790;
                             precioEnMonedaOferta = tipoPrecio === 'regular' ? 2700 : 1500;
                         }else if (moneda === 'EUR') {
-                            precioEnMonedaMasterFade = (precioMasterFadeUSD / rates[moneda]).toFixed(2);
-                            precioEnMonedaCutting =(precioCuttingUSD / rates[moneda]).toFixed(2);
-                            precioEnMonedaOferta = (precioOfertaUSD / rates[moneda]).toFixed(2);
+                            precioEnMonedaMasterFade = (precioMasterFadeUSD * rates[moneda]).toFixed(2);
+                            precioEnMonedaCutting =(precioCuttingUSD * rates[moneda]).toFixed(2);
+                            precioEnMonedaOferta = (precioOfertaUSD * rates[moneda]).toFixed(2);
                         }  
                         else {
                             precioEnMonedaMasterFade = Math.floor(precioMasterFadeUSD * rates[moneda]).toLocaleString();
@@ -265,7 +265,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     } else if (moneda === 'UYU') {
                         precioEnMoneda = tipoPrecio === 'regular' ? 5900 : 3800;
                     } else if (moneda === 'EUR') {
-                        precioEnMoneda = (precioFocusUSD / rates[moneda]).toFixed(2);
+                        precioEnMoneda = (precioFocusUSD * rates[moneda]).toFixed(2);
                     }  
                     else {
                         precioEnMoneda = Math.floor(precioFocusUSD * rates[moneda]).toLocaleString();
@@ -332,7 +332,7 @@ document.addEventListener('DOMContentLoaded', () => {
         rates = data.conversion_rates;
 
         // Aplica un incremento del 15% a la tasa EUR
-        rates['EUR'] = rates['EUR'] * 1.18;
+        rates['EUR'] = rates['EUR'] * 1.08;
 
         tasaCambioUSDARS = rates['ARS'];
         cotizacionesUSD.innerHTML = '<h2 style="color:white; font-weight: bold;"> Cotizaciones en relación al USD</h2>';
