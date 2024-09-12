@@ -49,12 +49,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const cursos = [
-        { nombre: "Master Fade", precios: { regularMasterFade: 47, regularCutting: 37, ofertaPorHoy: 66 } },
+        { nombre: "Master Fade", precios: { regularMasterFade: 47, regularCutting: 37, ofertaPorHoy: 67 } },
         { nombre: "Focus", precioUSD: 147 }
     ];
 
     const cursosDownsell = [
-        { nombre: "Master Fade", precios: { regularMasterFade: 29, regularCutting: 19, ofertaPorHoy: 44 } },
+        { nombre: "Master Fade", precios: { regularMasterFade: 29, regularCutting: 20, ofertaPorHoy: 44 } },
         { nombre: "Focus", precioUSD: 97 }
     ];
 
@@ -332,7 +332,7 @@ document.addEventListener('DOMContentLoaded', () => {
         rates = data.conversion_rates;
 
         // Aplica un incremento del 15% a la tasa EUR
-        rates['EUR'] = rates['EUR'] * 1.16;
+        rates['EUR'] = rates['EUR'] * 1.18;
 
         tasaCambioUSDARS = rates['ARS'];
         cotizacionesUSD.innerHTML = '<h2 style="color:white; font-weight: bold;"> Cotizaciones en relación al USD</h2>';
