@@ -5,7 +5,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const apiUrlCriptoYa = 'https://criptoya.com/api/binancep2p/USDT/ARS/1';
 
     const cotizacionesUSD = document.getElementById('cotizaciones-usd');
-    const cotizacionesARS = document.getElementById('cotizaciones-ars');
     const dolarBlueDiv = document.getElementById('dolar-blue');
     const dolarCriptoDiv = document.getElementById('dolar-cripto');
     const favoritasList = document.getElementById('favoritas-list');
@@ -174,7 +173,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 // Mostrar los precios en la interfaz
                 preciosContenidoDiv.innerHTML += `
-                <div id="cursos-disponibles">                    <h3>${selectedCourse} - ${tipoPrecio.charAt(0).toUpperCase() + tipoPrecio.slice(1)}</h3>
+                <div style="
+                background-color: #004AAD; /* Fondo azul sólido */
+                border-radius: 10px; 
+                width: 80%; 
+                color: white; /* Texto blanco */
+                padding: 10px; 
+                margin: 10px auto 10px auto; /* Centrado horizontal y 10px de margen inferior */
+                text-align: center;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5); /* Sombra alrededor */
+            ">                   <h3>${selectedCourse} - ${tipoPrecio.charAt(0).toUpperCase() + tipoPrecio.slice(1)}</h3>
                     <p>Precio regular Master Fade: $${precioMasterFadeUSD.toFixed(2)} USD</p>
                     <p>Precio regular Cutting Mastery: $${precioCuttingUSD.toFixed(2)} USD</p>
                     <p>Precio oferta por hoy: $${precioOfertaUSD.toFixed(2)} USD</p>
@@ -193,7 +201,12 @@ document.addEventListener('DOMContentLoaded', () => {
                             precioEnMonedaMasterFade = tipoPrecio === 'regular' ? 1900 : 1000;
                             precioEnMonedaCutting = tipoPrecio === 'regular' ? 1700 : 790;
                             precioEnMonedaOferta = tipoPrecio === 'regular' ? 2700 : 1500;
-                        } else {
+                        }else if (moneda === 'EUR') {
+                            precioEnMonedaMasterFade = (precioMasterFadeUSD / rates[moneda]).toFixed(2);
+                            precioEnMonedaCutting =(precioCuttingUSD / rates[moneda]).toFixed(2);
+                            precioEnMonedaOferta = (precioOfertaUSD / rates[moneda]).toFixed(2);
+                        }  
+                        else {
                             precioEnMonedaMasterFade = Math.floor(precioMasterFadeUSD * rates[moneda]).toLocaleString();
                             precioEnMonedaCutting = Math.floor(precioCuttingUSD * rates[moneda]).toLocaleString();
                             precioEnMonedaOferta = Math.floor(precioOfertaUSD * rates[moneda]).toLocaleString();
@@ -251,7 +264,10 @@ document.addEventListener('DOMContentLoaded', () => {
                         precioEnMoneda = tipoPrecio === 'regular' ? 97000 : 67000;
                     } else if (moneda === 'UYU') {
                         precioEnMoneda = tipoPrecio === 'regular' ? 5900 : 3800;
-                    } else {
+                    } else if (moneda === 'EUR') {
+                        precioEnMoneda = (precioFocusUSD / rates[moneda]).toFixed(2);
+                    }  
+                    else {
                         precioEnMoneda = Math.floor(precioFocusUSD * rates[moneda]).toLocaleString();
                     }
 
@@ -314,6 +330,10 @@ document.addEventListener('DOMContentLoaded', () => {
     .then(response => response.json())
     .then(data => {
         rates = data.conversion_rates;
+
+        // Aplica un incremento del 15% a la tasa EUR
+        rates['EUR'] = rates['EUR'] * 1.16;
+
         tasaCambioUSDARS = rates['ARS'];
         cotizacionesUSD.innerHTML = '<h2 style="color:white; font-weight: bold;"> Cotizaciones en relación al USD</h2>';
 
