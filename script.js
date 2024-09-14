@@ -29,8 +29,9 @@ document.addEventListener('DOMContentLoaded', () => {
         'MXN': 'Peso Mexicano',
         'PEN': 'Sol Peruano',
         'VES': 'Bolívar Venezolano',
+        'BOB': 'Peso Boliviano' // Nueva entrada
     };
-
+    
     const flagMapping = {
         'EUR': 'eu',
         'ARS': 'ar',
@@ -40,8 +41,10 @@ document.addEventListener('DOMContentLoaded', () => {
         'COP': 'co',
         'MXN': 'mx',
         'PEN': 'pe',
-        'VES': 've' 
+        'VES': 've',
+        'BOB': 'bo' // Nueva entrada
     };
+    
 
     let favoritos = JSON.parse(localStorage.getItem('favoritos')) || {};
     if (!favoritos || typeof favoritos !== 'object') {
@@ -202,9 +205,9 @@ document.addEventListener('DOMContentLoaded', () => {
                             precioEnMonedaCutting = tipoPrecio === 'regular' ? 1700 : 790;
                             precioEnMonedaOferta = tipoPrecio === 'regular' ? 2700 : 1500;
                         }else if (moneda === 'EUR') {
-                            precioEnMonedaMasterFade = (precioMasterFadeUSD * rates[moneda]).toFixed(2);
-                            precioEnMonedaCutting =(precioCuttingUSD * rates[moneda]).toFixed(2);
-                            precioEnMonedaOferta = (precioOfertaUSD * rates[moneda]).toFixed(2);
+                            precioEnMonedaMasterFade = (precioMasterFadeUSD * rates[moneda]).toFixed(0);
+                            precioEnMonedaCutting =(precioCuttingUSD * rates[moneda]).toFixed(0);
+                            precioEnMonedaOferta = (precioOfertaUSD * rates[moneda]).toFixed(0);
                         }  
                         else {
                             precioEnMonedaMasterFade = Math.floor(precioMasterFadeUSD * rates[moneda]).toLocaleString();
@@ -265,7 +268,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     } else if (moneda === 'UYU') {
                         precioEnMoneda = tipoPrecio === 'regular' ? 5900 : 3800;
                     } else if (moneda === 'EUR') {
-                        precioEnMoneda = (precioFocusUSD * rates[moneda]).toFixed(2);
+                        precioEnMoneda = (precioFocusUSD * rates[moneda]).toFixed(0);
                     }  
                     else {
                         precioEnMoneda = Math.floor(precioFocusUSD * rates[moneda]).toLocaleString();
