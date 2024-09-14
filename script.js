@@ -29,7 +29,8 @@ document.addEventListener('DOMContentLoaded', () => {
         'MXN': 'Peso Mexicano',
         'PEN': 'Sol Peruano',
         'VES': 'Bolívar Venezolano',
-        'BOB': 'Peso Boliviano' // Nueva entrada
+        'BOB': 'Peso Boliviano',
+        'PYG': 'Guaraní Paraguayo'    
     };
     
     const flagMapping = {
@@ -42,7 +43,8 @@ document.addEventListener('DOMContentLoaded', () => {
         'MXN': 'mx',
         'PEN': 'pe',
         'VES': 've',
-        'BOB': 'bo' // Nueva entrada
+        'BOB': 'bo',
+        'PYG': 'py'
     };
     
 
