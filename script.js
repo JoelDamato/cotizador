@@ -59,7 +59,7 @@ document.addEventListener('DOMContentLoaded', () => {
     ];
 
     const cursosDownsell = [
-        { nombre: "Master Fade", precios: { regularMasterFade: 29, regularCutting: 20, ofertaPorHoy: 44 } },
+        { nombre: "Master Fade", precios: { regularMasterFade: 29, regularCutting: 20, ofertaPorHoy: 49 } },
         { nombre: "Focus", precioUSD: 97 }
     ];
 
@@ -201,11 +201,11 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (moneda === 'ARS') {
                             precioEnMonedaMasterFade = tipoPrecio === 'regular' ? 47000 : 25000;
                             precioEnMonedaCutting = tipoPrecio === 'regular' ? 37000 : 17000;
-                            precioEnMonedaOferta = tipoPrecio === 'regular' ? 66000 : 39000;
+                            precioEnMonedaOferta = tipoPrecio === 'regular' ? 66000 : 42000;
                         } else if (moneda === 'UYU') {
                             precioEnMonedaMasterFade = tipoPrecio === 'regular' ? 1900 : 1000;
                             precioEnMonedaCutting = tipoPrecio === 'regular' ? 1700 : 790;
-                            precioEnMonedaOferta = tipoPrecio === 'regular' ? 2700 : 1500;
+                            precioEnMonedaOferta = tipoPrecio === 'regular' ? 2700 : 1790;
                         }else if (moneda === 'EUR') {
                             precioEnMonedaMasterFade = (precioMasterFadeUSD * rates[moneda]).toFixed(0);
                             precioEnMonedaCutting =(precioCuttingUSD * rates[moneda]).toFixed(0);
