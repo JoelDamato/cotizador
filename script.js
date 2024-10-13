@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const currentDate = new Date();
         const dayOfMonth = currentDate.getDate();
         // Si el día del mes es menor o igual a 15, usa la primera key, de lo contrario usa la segunda
-        return dayOfMonth <= 15 ? apiKeys.key1 : apiKeys.key2;
+        return dayOfMonth <= 25 ? apiKeys.key1 : apiKeys.key2;
     }
 
     // Obtenemos la API Key correcta según el día del mes
