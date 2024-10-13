@@ -1,6 +1,23 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const apiKey = '5bc1cec6967623eb3dcfbc4a';
+
+    const apiKeys = {
+        key1: 'dbc4f8cc9f4a1dafa9dbe25d',
+        key2: '5bc1cec6967623eb3dcfbc4a'
+    };
+
+    function getCurrentApiKey() {
+        const currentDate = new Date();
+        const dayOfMonth = currentDate.getDate();
+        // Si el día del mes es menor o igual a 15, usa la primera key, de lo contrario usa la segunda
+        return dayOfMonth <= 15 ? apiKeys.key1 : apiKeys.key2;
+    }
+
+    // Obtenemos la API Key correcta según el día del mes
+    const apiKey = getCurrentApiKey();
+
+    // Usamos la API Key para construir la URL
     const apiUrlUSD = `https://v6.exchangerate-api.com/v6/${apiKey}/latest/USD`;
+
     const apiUrlDolarBlue = 'https://criptoya.com/api/dolar';
     const apiUrlCriptoYa = 'https://criptoya.com/api/binancep2p/USDT/ARS/1';
 
